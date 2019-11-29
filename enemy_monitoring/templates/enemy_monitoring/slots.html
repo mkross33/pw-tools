@@ -1,0 +1,100 @@
+{% extends "public/base.html" %}
+
+{% block title %}
+    Enemy Slots
+{% endblock %}
+
+{% block main %}
+    <h2>Enemies With Open Slots</h2>
+    <!-- if there are no enemies, just display that message, no need to build an empty table -->
+    {% if no_enemies %}
+        <p>SK is not at war, no enemies to display. Contact the Lord Commander if you would like to see open slots for
+        a specific alliance.</p>
+    {% else %}
+    <p>You can sort by multiple columns. Click the first column you want to sort, then shift click to select a secondary filter.
+        <br />
+        <br />
+        Attack range is the score range <em>you</em> must be in to declare war on them</p>
+    <br />
+    <br />
+    <h4>Filter by nations in your war range</h4>
+    <label for="sk_score">Your Score</label>
+    <input type="text" id="sk_score" name="sk_score">
+    <br />
+    <div class="table-responsive">
+    <table id="enemy_data" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Ruler</th>
+                <th scope="col">Nation</th>
+                <th scope="col">Alliance</th>
+                <th scope="col">Open Slots</th>
+                <th scope="col">Beige Turns</th>
+                <th scope="col">Score</th>
+                <th scope="col">Attack Range</th>
+                <th scope="col">Soldiers</th>
+                <th scope="col">Tanks</th>
+                <th scope="col">Aircraft</th>
+                <th scope="col">Ships</th>
+                <th scope="col">Nukes</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <!-- loop through the data for each enemy and add it to the table -->
+            {% for nation in enemies %}
+                <tr>
+                    <td>{{ nation.leadername }}</td>
+                    <td><a href="{{ nation.link }}">{{ nation.name }}</a></td>
+                    <td>{{ nation.alliance }}</td>
+                    <td>{{ nation.slots }}</td>
+                    <td>{{ nation.beige_turns_left }}</td>
+                    <td>{{ nation.score }}</td>
+                    <td>{{ nation.min_score | floatformat:2 }} - {{ nation.max_score | floatformat:2 }} </td>
+                    <td>{{ nation.soldiers }}</td>
+                    <td>{{ nation.tanks }}</td>
+                    <td>{{ nation.aircraft }}</td>
+                    <td>{{ nation.ships }}</td>
+                    <td>{{ nation.nukes }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% endif %}
+
+    <script>
+// data table script. See https://datatables.net/ for more
+/* Custom filtering function which will search data in column four between two values */
+$.fn.dataTable.ext.search.push(
+    function( settings, data, dataIndex ) {
+        let sk_score = parseInt( $('#sk_score').val(), 10 );
+        let min = sk_score * .75;
+        let max = sk_score * 1.75;
+        let score = parseFloat( data[5] ) || 0; // use data for the score column
+
+        if ( ( isNaN( min ) && isNaN( max ) ) ||
+             ( isNaN( min ) && score <= max ) ||
+             ( min <= score   && isNaN( max ) ) ||
+             ( min <= score   && score <= max ) )
+        {
+            return true;
+        }
+        return false;
+    }
+);
+
+    $(document).ready( function () {
+        let table = $('#enemy_data').DataTable({
+            "order": [[ 4, 'asc' ]],
+        });
+
+        // Event listener to the two range filtering inputs to redraw on input
+        $('#sk_score').keyup( function() {
+            table.draw();
+        } );
+    });
+    </script>
+
+
+{% endblock %}

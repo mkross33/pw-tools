@@ -1,0 +1,80 @@
+<!-- CHANGES FROM CS50 - replaced table build with objects and custom decorators executing their methods. Added ability
+to message each nation in the table with the Inactivity Warning message -->
+{% extends "gov/base.html" %}
+{% load gov_extras %}
+{% block title %}
+    Activity Stats
+{% endblock %}
+<span style="color:red"
+{% block main %}
+    <h2>Activity Overview</h2>
+    <!-- flash any alerts from the server -->
+    {% if alert %}
+        <div class="alert alert-success" role="alert">
+            {{ alert }}
+        </div>
+    {% endif %}
+    <p>{{ inactives.total }} nations inactive today
+    <br />
+    <span style="color:red">{{ inactives.red }} red </span> |  <span style="color:purple">{{ inactives.purple }} purple</span></p>
+    <br />
+
+    <br />
+    <div class="table-responsive">
+    <table id="activity" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Ruler</th>
+                <th scope="col">Nation</th>
+                <th scope="col">Days Inactive</th>
+                <th scope="col">Cities</th>
+                <th scope="col">Score</th>
+                <th scope="col">Wars</th>
+                <th scope="col">Warning Message</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <!-- loop through the member objects -->
+            {% for member in members %}
+                <!-- if inactive, hilight with appropriate color. Previously there were no if statements, just if
+                days_inactive > 3, apply the activity color. However the color contrast was quite garish so I added logic
+                to put more soothing colors.-->
+                {% if member.activity_color == 'purple' %}
+                    <tr style="background: mediumpurple">
+                {% elif member.activity_color == 'red'%}
+                    <tr style="background: indianred">
+                {% else %}
+                    <tr>
+                {% endif %}
+                        <th scope="row">{{ member.ruler }}</th>
+                        <td>{{ member.nation }}</td>
+                        <td>{{ member.days_inactive }}</td>
+                        <td>{{ member|member_value:'cities' }}</td>
+                        <td>{{ member|member_value:'score' }}</td>
+                        <td>{{ member|member_value:'wars' }}</td>
+                        <!-- this td contains a form with 1 button, that sends the warning message -->
+                        <td>
+                            <form action="/gov/inactivity_warning" method="post">
+                                {% csrf_token %}
+                                <button class="btn btn-primary" name ="recipient" value="{{ member.nation_id }}" type="submit">Send Warning</button>
+                            </form>
+                        </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+    </div>
+
+    <script>
+    // data table script. See https://datatables.net/ for more
+    $(document).ready( function () {
+        $('#activity').DataTable({
+            "order": [[ 2, "desc" ]],
+        });
+    });
+    </script>
+
+
+{% endblock %}

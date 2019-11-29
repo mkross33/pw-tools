@@ -1,0 +1,59 @@
+{% extends "gov/base.html" %}
+<!-- django filters for formatting numbers in a more readable fashion -->
+{% load gov_extras %}
+{% block title %}
+    Member List
+{% endblock %}
+
+{% block main %}
+    <h2 class='text-center'>SK Members</h2>
+    <p class="text-center">Clicking on a ruler name will take you to the SK Tools page for that member. Clicking on
+    the nation name will take you to their in-game nation page.</p>
+    <br />
+
+
+<div class="table-responsive">
+    <table id="history" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Ruler</th>
+                <th scope="col">Nation</th>
+                <th scope="col">Cities</th>
+                <th scope="col">Score</th>
+                <th scope="col">Days Inactive</th>
+                <th scope="col">nation_id</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <!-- loop through each member and build a basic list. In the future I plan to add further details like
+             titles and peerages. I had hoped to include how long they have been members, however it turns out that is
+             rather hard to calculate. The game just records how long since they last joined the alliance, however it
+             often becomes necessary to have a member leave briefly in-game and rejoin, so that is not an accurate way to
+             gauge member duration. Though I could add a timestamp to the Member object for when new members are first added,
+             I don't want to work on this statistic until I can come up with a good way to get the numbers for existing
+             members.-->
+            {% for member in members %}
+                <tr>
+                    <td><a href="/gov/member/{{ member.nation_id }}"> {{ member.ruler }} </a></td>
+                    <td><a href="http://politicsandwar.com/nation/id={{ member.nation_id }}"> {{ member.nation }} </a></td>
+                    <td>{{ member|member_value:'cities' }}</td>
+                    <td>{{ member|member_value:'score' }}</td>
+                    <td>{{ member.days_inactive }}</td>
+                    <td>{{ member.nation_id }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+ <script>
+    // data table script. See https://datatables.net/ for more
+    $(document).ready( function () {
+        $('#history').DataTable({
+            "order": [[ 2, "desc" ]],
+        });
+    });
+    </script>
+
+{% endblock %}

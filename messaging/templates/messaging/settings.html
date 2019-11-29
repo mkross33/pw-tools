@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Messaging Settings
+{% endblock %}
+
+{% block main %}
+    <h2 class="text-center">Messaging Center</h2>
+    <br />
+    <!-- Set messenger and credentials  -->
+    <div class="row">
+        <h4>Messenger Settings</h4>
+        <div class="col-md-12">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="perm-tab" data-toggle="tab" href="#add" role="tab" aria-controls="add" aria-selected="true">Add a new messenger</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="defcon-tab" data-toggle="tab" href="#remove" role="tab" aria-controls="remove" aria-selected="false">Remove a messenger</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="users-tab" data-toggle="tab" href="#set" role="tab" aria-controls="set" aria-selected="false">Set active messenger</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <!-- add messenger credentials form -->
+                <div class="tab-pane fade show active" id="add" role="tabpanel" aria-labelledby="perm-tab">
+                    <br />
+                    <p>WARNING: Before adding your account as a messenger, change your password to something you have never
+                    and will never use. Messenger passwords must be stored in plaintext to be used to authenticate to the PW server</p>
+                    <form action="/messaging/add_messenger" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="ruler">PW Ruler Name</label>
+                            <input autocomplete="off" autofocus class="form-control" id="ruler" name="ruler">
+                        </div>
+                        <div class="form-group">
+                            <label for="username">PW Username</label>
+                            <input autocomplete="off" autofocus class="form-control" id="username" name="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">PW Password</label>
+                            <input autocomplete="off" autofocus class="form-control" id="password" name="password">
+                        </div>
+                        <button class="btn btn-primary" type="submit">Add Messenger</button>
+                    </form>
+                </div>
+
+                <!-- remove messenger-->
+                <div class="tab-pane fade" id="remove" role="tabpanel" aria-labelledby="perm-tab">
+                    <form action="/messaging/remove_messenger" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="messenger">Select Messenger</label>
+                            <select class="form-control" id="messenger" name="messenger">
+                                <option selected="true" disabled="disabled">------</option>
+                                {% for messenger in messengers %}
+                                    <option value="{{ messenger.id }}">{{ messenger.ruler_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Remove Messenger</button>
+                    </form>
+                </div>
+
+                <!-- set active messenger-->
+                <div class="tab-pane fade" id="set" role="tabpanel" aria-labelledby="perm-tab">
+                    <p>Current active messenger:
+                        {% if active_messenger %}
+                            {{ active_messenger }}
+                        {% endif %}
+                    </p>
+                    <form action="/messaging/set_active_messenger" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="messenger">Select Messenger</label>
+                            <select class="form-control" id="messenger" name="messenger">
+                                <option selected="true" disabled="disabled">------</option>
+                                {% for messenger in messengers %}
+                                    <option value="{{ messenger.id }}">{{ messenger.ruler_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Set as active messenger</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="row">
+        <h4>Message Settings</h4>
+        <div class="col-md-12">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="set-message-tab" data-toggle="tab" href="#set_message" role="tab" aria-controls="set_message" aria-selected="true">Update Messages</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="view-recruitment-tab" data-toggle="tab" href="#view_recruitment" role="tab" aria-controls="view_recruitment" aria-selected="false">View Recruitment Message</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="view-activity-tab" data-toggle="tab" href="#view_activity" role="tab" aria-controls="view_activity" aria-selected="false">View Activity Message</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <!-- Set a message-->
+                <div class="tab-pane fade show active" id="set_message" role="tabpanel" aria-labelledby="set-message-tab">
+                    <br />
+                    <p>Setting a new message will overwrite any existing message of the same type.
+                    <br /> [[ruler]] and [[nation]] can be used as placeholders for the ruler and nation name of the recipient, and
+                    will be automatically substituted when the message is sent.</p>
+                    <form action="/messaging/set_message" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <p>Type<p>
+                            <input type="radio" name="type" value="recruitment">Recruitment<br>
+                            <input type="radio" name="type" value="activity">Inactivity Warning<br>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <textarea class="form-control" id="subject" name="subject" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="body">Body</label>
+                            <textarea class="form-control" id="username" name="body" rows="5"></textarea>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Add Message</button>
+                    </form>
+                </div>
+                <!-- view recruitment message -->
+                <div class="tab-pane fade" id="view_recruitment" role="tabpanel" aria-labelledby="view-recruitment-tab">
+                    {% if recruitment %}
+                    <h5>Subject</h5>
+                    <p>{{ recruitment.subject }}</p>
+                    <h5>Body</h5>
+                    <p>{{ recruitment.body }}</p>
+                    {% else %}
+                    <p>No recruitment message set</p>
+                    {% endif %}
+                </div>
+                 <!-- view activity message -->
+                <div class="tab-pane fade" id="view_activity" role="tabpanel" aria-labelledby="view-activity-tab">
+                    {% if activity %}
+                    <h5>Subject</h5>
+                    <p>{{ activity.subject }}</p>
+                    <h5>Body</h5>
+                    <p>{{ activity.body }}</p>
+                    {% else %}
+                    <p>No Inactivity Warning message set</p>
+                    {% endif %}
+                </div>
+        </div>
+    </div>
+
+
+
+
+
+
+{% endblock %}

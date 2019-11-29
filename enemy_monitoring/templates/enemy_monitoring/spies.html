@@ -1,0 +1,66 @@
+{% extends "public/base.html" %}
+
+{% block title %}
+    Enemy Spies
+{% endblock %}
+
+{% block main %}
+    <h2>Enemy Spy Counts</h2>
+    <!-- if there are no enemies, just display that message, no need to build an empty table -->
+    {% if no_enemies %}
+        <p>No enemy alliances. Please add enemies in the gov panel and run the updater.</p>
+    {% else %}
+        <p>You can sort by multiple columns. Click the first column you want to sort, then shift click to select a secondary filter.</p>
+        <p>Non-arcane nations may have 5-8 fewer spies than reported, but should be fairly accurate. Estimates for arcane are
+        much less accurate, and may report up to 20 more spies than the nation actually has. Arcane is a work in progress.</p>
+        <p>Timestamps are currently in GMT. For now, ping Mikey if you want the numbers updated. Work is being done to be
+        able to run the update script from the front-end.</p>
+    <br />
+    <br />
+    <div class="table-responsive">
+    <table id="enemy_data" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Ruler</th>
+                <th scope="col">Nation</th>
+                <th scope="col">Alliance</th>
+                <th scope="col">Spies</th>
+                <th scope="col">Score</th>
+                <th scope="col">War Policy</th>
+                <th scope="col">Time Stamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- loop through the data for each enemy and add it to the table -->
+            {% for nation in enemies %}
+                <tr>
+                    <td>{{ nation.ruler }}</td>
+                    <td><a href="https://politicsandwar.com/nation/id={{ nation.nation_id }}">{{ nation.nation }}</a></td>
+                    <td>{{ nation.alliance.alliance_name }}</td>
+                    <td>{{ nation.spies }}</td>
+                    <td>{{ nation.score }}</td>
+                    {% if nation.policy == 'Arcane' %}
+                    <td style="color:#2C44E6">
+                        {% else %}
+                       <td>
+                    {% endif %}
+                    {{ nation.policy }}</td>
+                    <td>{{ nation.date }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% endif %}
+
+    <script>
+
+    $(document).ready( function () {
+        let table = $('#enemy_data').DataTable({
+            "order": [[ 3, 'desc' ]],
+        });
+    });
+    </script>
+
+
+{% endblock %}

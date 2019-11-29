@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    PW API Settings
+{% endblock %}
+
+{% block main %}
+
+    <h2>PW API Keys</h2>
+    <!-- flash any alerts from the server -->
+    {% if alert %}
+        <div class="alert alert-success" role="alert">
+            {{ alert }}
+        </div>
+    {% endif %}
+
+    <br />
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list"
+      aria-selected="true">View Keys</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="add-tab" data-toggle="tab" href="#add" role="tab" aria-controls="add"
+      aria-selected="false">Add Key</a>
+  </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="list" role="tabpanel" aria-labelledby="list-tab">
+
+    <!-- Table displaying existing API Keys -->
+    <div class="table-responsive">
+    <table id="apikeys" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Owner</th>
+                <th scope="col">Officer Status</th>
+                <th scope="col">Validity</th>
+                <th scope="col">Key</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- loop through the member objects -->
+            {% for key in keys %}
+                <tr>
+                <th scope="row">{{ key.key_owner }}</th>
+                {% if key.alliance_officer %}
+                    <td>Officer</td>
+                {% else %}
+                    <td>Member</td>
+                {% endif %}
+                {% if key.valid %}
+                    <td>Valid</td>
+                {% else %}
+                    <td>Invalid</td>
+                {% endif %}
+                <!-- this td contains a form with 1 button, that sends the warning message -->
+                <td>{{ key.key }}</td>
+                <td>
+                    <form action="/pwapi/remove_key" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-primary" name ="key" value="{{ key.key }}" type="submit">Remove Key</button>
+                    </form>
+                </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+    </div>
+  </div>
+  <div class="tab-pane fade" id="add" role="tabpanel" aria-labelledby="add-tab">
+      <form action="add_key" method="post">
+          {% csrf_token %}
+          <div class="form-group">
+              <label for="owner">Key Owner</label>
+              <input autocomplete="off" autofocus class="form-control" id="owner" name="owner">
+          </div>
+          <div class="form-group">
+              <label for="owner">Key</label>
+              <input autocomplete="off" autofocus class="form-control" id="key" name="key">
+          </div>
+          <p>Key Permissions:</p>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="officer_status" id="member" value="member" checked>
+            <label class="form-check-label" for="member">
+                Member
+            </label>
+          </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="officer_status" id="officer" value="officer">
+            <label class="form-check-label" for="officer">
+                Officer
+            </label>
+        </div>
+          <br />
+          <button class="btn btn-primary" name ="submit" type="submit">Add Key</button>
+      </form>
+  </div>
+
+
+
+{% endblock %}

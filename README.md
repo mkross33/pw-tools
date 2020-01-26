@@ -10,14 +10,11 @@ pw-tools is a Django app containing a suite of monitering and management tools f
 * Messaging center for sending automated recruitment messages and activity warnings
 
 
-## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
+## Prerequisites
 PW-Tools requires Python 3.6+, and Django 2.2+
 
 
-#### License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details

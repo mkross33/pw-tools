@@ -25,7 +25,7 @@ SECRET_KEY = 'vk!-6)+%l6g2&^c!olzyuak)^qy9k*9$mn&2gp51pz7wnhp+ej'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'sktools.dev', 'www.sktools.dev', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition

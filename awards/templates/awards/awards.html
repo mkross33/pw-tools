@@ -1,0 +1,9 @@
+{% block main %}
+    <h2>Awards</h2>
+
+    {% for award in awards %}
+        <h4>{{ award.name }}</h4>
+        <img src="{{ award.image.url }}" style="max-width: 400px;">
+
+    {% endfor %}
+{% endblock %}
